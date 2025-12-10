@@ -26,31 +26,37 @@ model User {
   @@map("users")
 }
 
-model Event {
+// Venue = Local para eventos (sala, auditório, etc.)
+model Venue {
   id          String    @id @default(uuid())
-  title       String
+  name        String
   description String?
-  date        DateTime
   location    String
   capacity    Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   bookings    Booking[]
 
-  @@map("events")
+  @@map("venues")
 }
 
+// Booking = Reserva de um local para um evento específico
 model Booking {
-  id        String   @id @default(uuid())
-  userId    String
-  eventId   String
-  status    String   @default("confirmed")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  userId      String
+  venueId     String
+  eventName   String // Nome do evento que será realizado
+  description String? // Descrição do evento
+  date        DateTime // Data do evento
+  startTime   DateTime // Horário de início
+  endTime     DateTime // Horário de término
+  status      String   @default("confirmed") // confirmed, cancelled, pending
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user  User  @relation(fields: [userId], references: [id])
-  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, eventId])
+  @@index([venueId, date, startTime, endTime])
   @@map("bookings")
 }

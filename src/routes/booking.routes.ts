@@ -6,6 +6,7 @@ const bookingController = new BookingController();
 
 bookingRoutes.get('/', bookingController.index);
 bookingRoutes.post('/', bookingController.create);
+bookingRoutes.put('/:id', bookingController.update);
 bookingRoutes.delete('/:id', bookingController.delete);
 
 export default bookingRoutes;

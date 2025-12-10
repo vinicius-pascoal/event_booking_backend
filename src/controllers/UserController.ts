@@ -14,7 +14,7 @@ export class UserController {
         updatedAt: true,
         bookings: {
           include: {
-            event: true
+            venue: true
           }
         }
       }
@@ -37,7 +37,7 @@ export class UserController {
         updatedAt: true,
         bookings: {
           include: {
-            event: true
+            venue: true
           }
         }
       }

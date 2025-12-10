@@ -1,21 +1,21 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database';
 
-export class EventController {
+export class VenueController {
   async index(req: Request, res: Response) {
-    const events = await prisma.event.findMany({
+    const venues = await prisma.venue.findMany({
       include: {
         bookings: true
       }
     });
 
-    return res.json(events);
+    return res.json(venues);
   }
 
   async show(req: Request, res: Response) {
     const { id } = req.params;
 
-    const event = await prisma.event.findUnique({
+    const venue = await prisma.venue.findUnique({
       where: { id },
       include: {
         bookings: {
@@ -26,51 +26,49 @@ export class EventController {
       }
     });
 
-    if (!event) {
-      return res.status(404).json({ error: 'Event not found' });
+    if (!venue) {
+      return res.status(404).json({ error: 'Venue not found' });
     }
 
-    return res.json(event);
+    return res.json(venue);
   }
 
   async create(req: Request, res: Response) {
-    const { title, description, date, location, capacity } = req.body;
+    const { name, description, location, capacity } = req.body;
 
-    const event = await prisma.event.create({
+    const venue = await prisma.venue.create({
       data: {
-        title,
+        name,
         description,
-        date: new Date(date),
         location,
         capacity
       }
     });
 
-    return res.status(201).json(event);
+    return res.status(201).json(venue);
   }
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    const { title, description, date, location, capacity } = req.body;
+    const { name, description, location, capacity } = req.body;
 
-    const event = await prisma.event.update({
+    const venue = await prisma.venue.update({
       where: { id },
       data: {
-        title,
+        name,
         description,
-        date: date ? new Date(date) : undefined,
         location,
         capacity
       }
     });
 
-    return res.json(event);
+    return res.json(venue);
   }
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
 
-    await prisma.event.delete({
+    await prisma.venue.delete({
       where: { id }
     });
 

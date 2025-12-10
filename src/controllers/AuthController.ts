@@ -159,7 +159,7 @@ export class AuthController {
         include: {
           bookings: {
             include: {
-              event: true,
+              venue: true,
             },
           },
         },

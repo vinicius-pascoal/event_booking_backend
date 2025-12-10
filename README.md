@@ -1,6 +1,14 @@
-# Event Booking Backend
+# Venue Booking Backend
 
-Backend para sistema de reserva de eventos desenvolvido com Node.js, Express, TypeScript e Prisma.
+Backend para sistema de reserva de locais para eventos desenvolvido com Node.js, Express, TypeScript e Prisma.
+
+## 📌 Conceito
+
+Este sistema gerencia **locais (venues)** e **reservas (bookings)**:
+
+- **Venues**: São os locais físicos onde eventos podem acontecer (salas, auditórios, espaços, etc.)
+- **Bookings**: São as reservas desses locais para eventos específicos, com horários definidos
+- **Validação de Conflitos**: O sistema impede que múltiplos eventos sejam agendados no mesmo local com horários sobrepostos
 
 ## 🚀 Tecnologias
 
@@ -108,16 +116,21 @@ event_booking_backend/
 │   ├── config/
 │   │   └── database.ts
 │   ├── controllers/
+│   │   ├── AuthController.ts
 │   │   ├── BookingController.ts
-│   │   ├── EventController.ts
+│   │   ├── VenueController.ts
 │   │   └── UserController.ts
 │   ├── middlewares/
+│   │   ├── auth.ts
 │   │   └── errorHandler.ts
 │   ├── routes/
+│   │   ├── auth.routes.ts
 │   │   ├── booking.routes.ts
-│   │   ├── event.routes.ts
+│   │   ├── venue.routes.ts
 │   │   ├── user.routes.ts
 │   │   └── index.ts
+│   ├── utils/
+│   │   └── jwt.ts
 │   ├── app.ts
 │   └── server.ts
 ├── .dockerignore
@@ -381,13 +394,14 @@ DELETE /api/users/:id
 
 ---
 
-### 🎉 Eventos
+### 🏢 Locais (Venues)
 
-**⚠️ Todas as rotas de eventos requerem autenticação**
+**⚠️ Todas as rotas de locais requerem autenticação**
 
-#### Listar todos os eventos
+#### Listar todos os locais
 ```http
-GET /api/events
+GET /api/venues
+Authorization: Bearer {token}
 ```
 
 **Resposta (200):**
@@ -395,11 +409,10 @@ GET /api/events
 [
   {
     "id": "770e8400-e29b-41d4-a716-446655440002",
-    "title": "Workshop de Node.js",
-    "description": "Aprenda Node.js do zero",
-    "date": "2025-12-20T14:00:00.000Z",
-    "location": "São Paulo - SP",
-    "capacity": 50,
+    "name": "Auditório Principal",
+    "description": "Auditório com capacidade para 100 pessoas",
+    "location": "São Paulo - SP, Rua Exemplo 123",
+    "capacity": 100,
     "createdAt": "2025-12-10T10:00:00.000Z",
     "updatedAt": "2025-12-10T10:00:00.000Z",
     "bookings": []
@@ -407,27 +420,29 @@ GET /api/events
 ]
 ```
 
-#### Buscar evento por ID
+#### Buscar local por ID
 ```http
-GET /api/events/:id
+GET /api/venues/:id
+Authorization: Bearer {token}
 ```
 
 **Resposta (200):**
 ```json
 {
   "id": "770e8400-e29b-41d4-a716-446655440002",
-  "title": "Workshop de Node.js",
-  "description": "Aprenda Node.js do zero",
-  "date": "2025-12-20T14:00:00.000Z",
-  "location": "São Paulo - SP",
-  "capacity": 50,
+  "name": "Auditório Principal",
+  "description": "Auditório com capacidade para 100 pessoas",
+  "location": "São Paulo - SP, Rua Exemplo 123",
+  "capacity": 100,
   "createdAt": "2025-12-10T10:00:00.000Z",
   "updatedAt": "2025-12-10T10:00:00.000Z",
   "bookings": [
     {
       "id": "660e8400-e29b-41d4-a716-446655440001",
-      "userId": "550e8400-e29b-41d4-a716-446655440000",
-      "status": "confirmed",
+      "eventName": "Workshop de Node.js",
+      "date": "2025-12-20T00:00:00.000Z",
+      "startTime": "2025-12-20T14:00:00.000Z",
+      "endTime": "2025-12-20T18:00:00.000Z",
       "user": {
         "name": "João Silva",
         "email": "joao@example.com"
@@ -437,20 +452,20 @@ GET /api/events/:id
 }
 ```
 
-#### Criar novo evento
+#### Criar novo local
 ```http
-POST /api/events
+POST /api/venues
+Authorization: Bearer {token}
 Content-Type: application/json
 ```
 
 **Body:**
 ```json
 {
-  "title": "Workshop de Node.js",
-  "description": "Aprenda Node.js do zero",
-  "date": "2025-12-20T14:00:00.000Z",
-  "location": "São Paulo - SP",
-  "capacity": 50
+  "name": "Auditório Principal",
+  "description": "Auditório com capacidade para 100 pessoas",
+  "location": "São Paulo - SP, Rua Exemplo 123",
+  "capacity": 100
 }
 ```
 
@@ -458,30 +473,29 @@ Content-Type: application/json
 ```json
 {
   "id": "770e8400-e29b-41d4-a716-446655440002",
-  "title": "Workshop de Node.js",
-  "description": "Aprenda Node.js do zero",
-  "date": "2025-12-20T14:00:00.000Z",
-  "location": "São Paulo - SP",
-  "capacity": 50,
+  "name": "Auditório Principal",
+  "description": "Auditório com capacidade para 100 pessoas",
+  "location": "São Paulo - SP, Rua Exemplo 123",
+  "capacity": 100,
   "createdAt": "2025-12-10T10:00:00.000Z",
   "updatedAt": "2025-12-10T10:00:00.000Z"
 }
 ```
 
-#### Atualizar evento
+#### Atualizar local
 ```http
-PUT /api/events/:id
+PUT /api/venues/:id
+Authorization: Bearer {token}
 Content-Type: application/json
 ```
 
 **Body:**
 ```json
 {
-  "title": "Workshop Avançado de Node.js",
-  "description": "Node.js avançado com TypeScript",
-  "date": "2025-12-21T14:00:00.000Z",
-  "location": "São Paulo - SP",
-  "capacity": 60
+  "name": "Auditório Principal Renovado",
+  "description": "Auditório reformado com capacidade para 150 pessoas",
+  "location": "São Paulo - SP, Rua Exemplo 123",
+  "capacity": 150
 }
 ```
 
@@ -489,32 +503,35 @@ Content-Type: application/json
 ```json
 {
   "id": "770e8400-e29b-41d4-a716-446655440002",
-  "title": "Workshop Avançado de Node.js",
-  "description": "Node.js avançado com TypeScript",
-  "date": "2025-12-21T14:00:00.000Z",
-  "location": "São Paulo - SP",
-  "capacity": 60,
+  "name": "Auditório Principal Renovado",
+  "description": "Auditório reformado com capacidade para 150 pessoas",
+  "location": "São Paulo - SP, Rua Exemplo 123",
+  "capacity": 150,
   "createdAt": "2025-12-10T10:00:00.000Z",
   "updatedAt": "2025-12-10T12:00:00.000Z"
 }
 ```
 
-#### Deletar evento
+#### Deletar local
 ```http
-DELETE /api/events/:id
+DELETE /api/venues/:id
+Authorization: Bearer {token}
 ```
 
 **Resposta (204):** Sem conteúdo
 
 ---
 
-### 📅 Reservas
+### 📅 Reservas (Bookings)
 
 **⚠️ Todas as rotas de reservas requerem autenticação**
+
+As reservas representam eventos que serão realizados em um local específico, com horário de início e término.
 
 #### Listar todas as reservas
 ```http
 GET /api/bookings
+Authorization: Bearer {token}
 ```
 
 **Resposta (200):**
@@ -523,7 +540,12 @@ GET /api/bookings
   {
     "id": "660e8400-e29b-41d4-a716-446655440001",
     "userId": "550e8400-e29b-41d4-a716-446655440000",
-    "eventId": "770e8400-e29b-41d4-a716-446655440002",
+    "venueId": "770e8400-e29b-41d4-a716-446655440002",
+    "eventName": "Workshop de Node.js",
+    "description": "Aprenda Node.js do zero ao avançado",
+    "date": "2025-12-20T00:00:00.000Z",
+    "startTime": "2025-12-20T14:00:00.000Z",
+    "endTime": "2025-12-20T18:00:00.000Z",
     "status": "confirmed",
     "createdAt": "2025-12-10T10:30:00.000Z",
     "updatedAt": "2025-12-10T10:30:00.000Z",
@@ -532,10 +554,9 @@ GET /api/bookings
       "name": "João Silva",
       "email": "joao@example.com"
     },
-    "event": {
+    "venue": {
       "id": "770e8400-e29b-41d4-a716-446655440002",
-      "title": "Workshop de Node.js",
-      "date": "2025-12-20T14:00:00.000Z",
+      "name": "Auditório Principal",
       "location": "São Paulo - SP"
     }
   }
@@ -545,6 +566,7 @@ GET /api/bookings
 #### Criar nova reserva
 ```http
 POST /api/bookings
+Authorization: Bearer {token}
 Content-Type: application/json
 ```
 
@@ -552,7 +574,12 @@ Content-Type: application/json
 ```json
 {
   "userId": "550e8400-e29b-41d4-a716-446655440000",
-  "eventId": "770e8400-e29b-41d4-a716-446655440002"
+  "venueId": "770e8400-e29b-41d4-a716-446655440002",
+  "eventName": "Workshop de Node.js",
+  "description": "Aprenda Node.js do zero ao avançado",
+  "date": "2025-12-20T00:00:00.000Z",
+  "startTime": "2025-12-20T14:00:00.000Z",
+  "endTime": "2025-12-20T18:00:00.000Z"
 }
 ```
 
@@ -561,7 +588,12 @@ Content-Type: application/json
 {
   "id": "660e8400-e29b-41d4-a716-446655440001",
   "userId": "550e8400-e29b-41d4-a716-446655440000",
-  "eventId": "770e8400-e29b-41d4-a716-446655440002",
+  "venueId": "770e8400-e29b-41d4-a716-446655440002",
+  "eventName": "Workshop de Node.js",
+  "description": "Aprenda Node.js do zero ao avançado",
+  "date": "2025-12-20T00:00:00.000Z",
+  "startTime": "2025-12-20T14:00:00.000Z",
+  "endTime": "2025-12-20T18:00:00.000Z",
   "status": "confirmed",
   "createdAt": "2025-12-10T10:30:00.000Z",
   "updatedAt": "2025-12-10T10:30:00.000Z",
@@ -570,34 +602,125 @@ Content-Type: application/json
     "name": "João Silva",
     "email": "joao@example.com"
   },
-  "event": {
+  "venue": {
     "id": "770e8400-e29b-41d4-a716-446655440002",
-    "title": "Workshop de Node.js",
-    "date": "2025-12-20T14:00:00.000Z"
+    "name": "Auditório Principal",
+    "location": "São Paulo - SP"
   }
 }
 ```
 
-**Erro - Evento lotado (400):**
+**Erro - Conflito de horário (409):**
 ```json
 {
-  "error": "Event is at full capacity"
+  "error": "Time slot conflict",
+  "message": "This venue already has a booking during the requested time",
+  "conflictingBookings": [
+    {
+      "id": "660e8400-e29b-41d4-a716-446655440001",
+      "eventName": "Workshop de TypeScript",
+      "date": "2025-12-20T00:00:00.000Z",
+      "startTime": "2025-12-20T13:00:00.000Z",
+      "endTime": "2025-12-20T17:00:00.000Z"
+    }
+  ]
 }
 ```
 
-**Erro - Evento não encontrado (404):**
+**Erro - Horário inválido (400):**
 ```json
 {
-  "error": "Event not found"
+  "error": "Start time must be before end time"
+}
+```
+
+**Erro - Local não encontrado (404):**
+```json
+{
+  "error": "Venue not found"
+}
+```
+
+**Erro - Capacidade excedida (400):**
+```json
+{
+  "error": "Venue is at full capacity for this time slot"
+}
+```
+
+#### Atualizar status da reserva
+```http
+PUT /api/bookings/:id
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "status": "cancelled"
+}
+```
+
+**Valores permitidos para status:** `confirmed`, `cancelled`, `pending`
+
+**Resposta (200):**
+```json
+{
+  "id": "660e8400-e29b-41d4-a716-446655440001",
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "venueId": "770e8400-e29b-41d4-a716-446655440002",
+  "eventName": "Workshop de Node.js",
+  "description": "Aprenda Node.js do zero ao avançado",
+  "date": "2025-12-20T00:00:00.000Z",
+  "startTime": "2025-12-20T14:00:00.000Z",
+  "endTime": "2025-12-20T18:00:00.000Z",
+  "status": "cancelled",
+  "createdAt": "2025-12-10T10:30:00.000Z",
+  "updatedAt": "2025-12-10T11:00:00.000Z",
+  "user": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "João Silva",
+    "email": "joao@example.com"
+  },
+  "venue": {
+    "id": "770e8400-e29b-41d4-a716-446655440002",
+    "name": "Auditório Principal",
+    "location": "São Paulo - SP"
+  }
 }
 ```
 
 #### Deletar reserva
 ```http
 DELETE /api/bookings/:id
+Authorization: Bearer {token}
 ```
 
 **Resposta (204):** Sem conteúdo
+
+---
+
+## 🔍 Validação de Conflitos
+
+O sistema automaticamente valida conflitos de horário ao criar uma nova reserva:
+
+1. **Mesmo Local**: Verifica se já existe uma reserva para o mesmo local (venue)
+2. **Mesma Data**: Compara apenas reservas na mesma data
+3. **Sobreposição de Horários**: Um conflito ocorre quando:
+   - O novo horário de início é antes do fim de uma reserva existente **E**
+   - O novo horário de fim é depois do início de uma reserva existente
+4. **Status**: Apenas reservas não canceladas são consideradas
+
+### Exemplos de Conflito:
+
+| Reserva Existente | Nova Reserva | Conflito? |
+|------------------|--------------|-----------|
+| 14:00 - 18:00    | 16:00 - 20:00 | ✅ Sim    |
+| 14:00 - 18:00    | 18:00 - 20:00 | ❌ Não    |
+| 14:00 - 18:00    | 10:00 - 14:00 | ❌ Não    |
+| 14:00 - 18:00    | 15:00 - 17:00 | ✅ Sim    |
+| 14:00 - 18:00    | 12:00 - 20:00 | ✅ Sim    |
 
 ---
 
@@ -639,24 +762,31 @@ event_booking_backend/
 - id (UUID)
 - email (String, único)
 - name (String)
+- password (String, hash bcrypt)
+- provider (String, padrão: "local")
+- providerId (String, opcional - para OAuth)
 - createdAt (DateTime)
 - updatedAt (DateTime)
 
-### Event
+### Venue (Local)
 - id (UUID)
-- title (String)
-- description (String, opcional)
-- date (DateTime)
-- location (String)
-- capacity (Int)
+- name (String) - Nome do local
+- description (String, opcional) - Descrição do local
+- location (String) - Endereço físico
+- capacity (Int) - Capacidade máxima
 - createdAt (DateTime)
 - updatedAt (DateTime)
 
-### Booking
+### Booking (Reserva)
 - id (UUID)
-- userId (UUID)
-- eventId (UUID)
-- status (String, padrão: "confirmed")
+- userId (UUID) - Usuário que fez a reserva
+- venueId (UUID) - Local reservado
+- eventName (String) - Nome do evento a ser realizado
+- description (String, opcional) - Descrição do evento
+- date (DateTime) - Data do evento
+- startTime (DateTime) - Horário de início
+- endTime (DateTime) - Horário de término
+- status (String, padrão: "confirmed") - Status: confirmed, cancelled, pending
 - createdAt (DateTime)
 - updatedAt (DateTime)
 

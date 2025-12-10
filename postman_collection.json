@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Event Booking API with Auth",
-    "description": "Collection para testar a API de reserva de eventos com autenticação JWT",
+    "name": "Venue Booking API with Auth",
+    "description": "Collection para testar a API de reserva de locais com autenticação JWT e validação de conflitos de horário",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -36,7 +36,7 @@
       "type": "string"
     },
     {
-      "key": "eventId",
+      "key": "venueId",
       "value": "",
       "type": "string"
     },
@@ -144,7 +144,7 @@
                 "login"
               ]
             },
-            "description": "Faz login. Token e refresh token são salvos automaticamente."
+            "description": "Faz login com email e senha. Token e refresh token são salvos automaticamente."
           },
           "response": []
         },
@@ -159,7 +159,7 @@
                   "    const response = pm.response.json();",
                   "    pm.collectionVariables.set(\"token\", response.token);",
                   "    pm.collectionVariables.set(\"refreshToken\", response.refreshToken);",
-                  "    console.log(\"✅ New token saved:\", response.token);",
+                  "    console.log(\"✅ Tokens refreshed successfully\");",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -191,12 +191,12 @@
                 "refresh-token"
               ]
             },
-            "description": "Gera novos tokens usando o refresh token."
+            "description": "Renova o token usando o refresh token. Novos tokens são salvos automaticamente."
           },
           "response": []
         },
         {
-          "name": "Get Current User (Me)",
+          "name": "Get Current User",
           "request": {
             "method": "GET",
             "header": [],
@@ -210,12 +210,11 @@
                 "me"
               ]
             },
-            "description": "Retorna os dados do usuário autenticado (requer token)."
+            "description": "Retorna os dados do usuário autenticado."
           },
           "response": []
         }
-      ],
-      "description": "Endpoints de autenticação. Register e Login salvam o token automaticamente."
+      ]
     },
     {
       "name": "👤 Users",
@@ -234,7 +233,7 @@
                 "users"
               ]
             },
-            "description": "Lista todos os usuários (requer autenticação)"
+            "description": "Lista todos os usuários cadastrados."
           },
           "response": []
         },
@@ -253,55 +252,12 @@
                 "{{userId}}"
               ]
             },
-            "description": "Busca um usuário por ID (requer autenticação)"
-          },
-          "response": []
-        }
-      ],
-      "description": "Endpoints de gerenciamento de usuários (todos requerem autenticação)"
-    },
-    {
-      "name": "🎉 Events",
-      "item": [
-        {
-          "name": "List All Events",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/events",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "events"
-              ]
-            },
-            "description": "Lista todos os eventos (requer autenticação)"
+            "description": "Busca um usuário específico por ID."
           },
           "response": []
         },
         {
-          "name": "Get Event by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/events/{{eventId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "events",
-                "{{eventId}}"
-              ]
-            },
-            "description": "Busca um evento por ID (requer autenticação)"
-          },
-          "response": []
-        },
-        {
-          "name": "Create Event",
+          "name": "Create User",
           "event": [
             {
               "listen": "test",
@@ -309,8 +265,8 @@
                 "exec": [
                   "if (pm.response.code === 201) {",
                   "    const response = pm.response.json();",
-                  "    pm.collectionVariables.set(\"eventId\", response.id);",
-                  "    console.log(\"✅ Event ID saved:\", response.id);",
+                  "    pm.collectionVariables.set(\"userId\", response.id);",
+                  "    console.log(\"✅ User ID saved:\", response.id);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -327,23 +283,23 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Workshop de Node.js\",\n  \"description\": \"Aprenda Node.js do zero\",\n  \"date\": \"2025-12-20T14:00:00.000Z\",\n  \"location\": \"São Paulo - SP\",\n  \"capacity\": 50\n}"
+              "raw": "{\n  \"email\": \"joao@example.com\",\n  \"name\": \"João Silva\",\n  \"password\": \"senha123\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/events",
+              "raw": "{{baseUrl}}/users",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "events"
+                "users"
               ]
             },
-            "description": "Cria um novo evento. ID salvo automaticamente (requer autenticação)"
+            "description": "Cria um novo usuário. ID é salvo automaticamente."
           },
           "response": []
         },
         {
-          "name": "Update Event",
+          "name": "Update User",
           "request": {
             "method": "PUT",
             "header": [
@@ -354,43 +310,173 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Workshop Avançado de Node.js\",\n  \"description\": \"Node.js avançado com TypeScript\",\n  \"date\": \"2025-12-21T14:00:00.000Z\",\n  \"location\": \"São Paulo - SP\",\n  \"capacity\": 60\n}"
+              "raw": "{\n  \"email\": \"joao.novo@example.com\",\n  \"name\": \"João Silva Santos\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/events/{{eventId}}",
+              "raw": "{{baseUrl}}/users/{{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "events",
-                "{{eventId}}"
+                "users",
+                "{{userId}}"
               ]
             },
-            "description": "Atualiza um evento (requer autenticação)"
+            "description": "Atualiza dados de um usuário."
           },
           "response": []
         },
         {
-          "name": "Delete Event",
+          "name": "Delete User",
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/events/{{eventId}}",
+              "raw": "{{baseUrl}}/users/{{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "events",
-                "{{eventId}}"
+                "users",
+                "{{userId}}"
               ]
             },
-            "description": "Remove um evento (requer autenticação)"
+            "description": "Remove um usuário."
           },
           "response": []
         }
-      ],
-      "description": "Endpoints de gerenciamento de eventos (todos requerem autenticação)"
+      ]
+    },
+    {
+      "name": "🏢 Venues",
+      "item": [
+        {
+          "name": "List All Venues",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/venues",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "venues"
+              ]
+            },
+            "description": "Lista todos os locais cadastrados."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Venue by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/venues/{{venueId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "venues",
+                "{{venueId}}"
+              ]
+            },
+            "description": "Busca um local específico por ID com suas reservas."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Venue",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set(\"venueId\", response.id);",
+                  "    console.log(\"✅ Venue ID saved:\", response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Auditório Principal\",\n  \"description\": \"Auditório com capacidade para 100 pessoas\",\n  \"location\": \"São Paulo - SP, Rua Exemplo 123\",\n  \"capacity\": 100\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/venues",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "venues"
+              ]
+            },
+            "description": "Cria um novo local. ID é salvo automaticamente."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Venue",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Auditório Principal Renovado\",\n  \"description\": \"Auditório reformado com capacidade para 150 pessoas\",\n  \"location\": \"São Paulo - SP, Rua Exemplo 123\",\n  \"capacity\": 150\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/venues/{{venueId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "venues",
+                "{{venueId}}"
+              ]
+            },
+            "description": "Atualiza dados de um local."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Venue",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/venues/{{venueId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "venues",
+                "{{venueId}}"
+              ]
+            },
+            "description": "Remove um local."
+          },
+          "response": []
+        }
+      ]
     },
     {
       "name": "📅 Bookings",
@@ -409,7 +495,7 @@
                 "bookings"
               ]
             },
-            "description": "Lista todas as reservas (requer autenticação)"
+            "description": "Lista todas as reservas com detalhes de usuários e locais."
           },
           "response": []
         },
@@ -440,7 +526,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"eventId\": \"{{eventId}}\"\n}"
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"venueId\": \"{{venueId}}\",\n  \"eventName\": \"Workshop de Node.js\",\n  \"description\": \"Aprenda Node.js do zero ao avançado\",\n  \"date\": \"2025-12-20T00:00:00.000Z\",\n  \"startTime\": \"2025-12-20T14:00:00.000Z\",\n  \"endTime\": \"2025-12-20T18:00:00.000Z\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/bookings",
@@ -451,7 +537,62 @@
                 "bookings"
               ]
             },
-            "description": "Cria uma nova reserva. ID salvo automaticamente (requer autenticação)"
+            "description": "Cria uma nova reserva. Valida conflitos de horário automaticamente. ID é salvo automaticamente."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Booking - Conflicting Time",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"venueId\": \"{{venueId}}\",\n  \"eventName\": \"Workshop de TypeScript\",\n  \"description\": \"Aprenda TypeScript\",\n  \"date\": \"2025-12-20T00:00:00.000Z\",\n  \"startTime\": \"2025-12-20T16:00:00.000Z\",\n  \"endTime\": \"2025-12-20T20:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bookings"
+              ]
+            },
+            "description": "Tenta criar uma reserva com conflito de horário (deve retornar erro 409)."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Booking Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings/{{bookingId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "bookings",
+                "{{bookingId}}"
+              ]
+            },
+            "description": "Atualiza o status da reserva (confirmed, cancelled, pending)."
           },
           "response": []
         },
@@ -470,12 +611,11 @@
                 "{{bookingId}}"
               ]
             },
-            "description": "Cancela uma reserva (requer autenticação)"
+            "description": "Remove uma reserva."
           },
           "response": []
         }
-      ],
-      "description": "Endpoints de gerenciamento de reservas (todos requerem autenticação)"
+      ]
     }
   ]
 }
