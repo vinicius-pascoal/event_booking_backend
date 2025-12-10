@@ -30,11 +30,12 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/dist
     depends_on:
       - postgres
     networks:
       - event_booking_network
-    command: sh -c "npx prisma migrate dev && npm run dev"
+    command: sh -c "npx prisma generate && npx prisma migrate dev && npm run dev"
 
 volumes:
   postgres_dev_data:
