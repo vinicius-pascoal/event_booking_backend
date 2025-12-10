@@ -157,24 +157,453 @@ npm run prisma:studio
 
 ## 📚 Rotas da API
 
-### Usuários
-- `GET /api/users` - Lista todos os usuários
-- `GET /api/users/:id` - Busca um usuário por ID
-- `POST /api/users` - Cria um novo usuário
-- `PUT /api/users/:id` - Atualiza um usuário
-- `DELETE /api/users/:id` - Remove um usuário
+Base URL: `http://localhost:3000/api`
 
-### Eventos
-- `GET /api/events` - Lista todos os eventos
-- `GET /api/events/:id` - Busca um evento por ID
-- `POST /api/events` - Cria um novo evento
-- `PUT /api/events/:id` - Atualiza um evento
-- `DELETE /api/events/:id` - Remove um evento
+### 🔐 Autenticação
 
-### Reservas
-- `GET /api/bookings` - Lista todas as reservas
-- `POST /api/bookings` - Cria uma nova reserva
-- `DELETE /api/bookings/:id` - Remove uma reserva
+A API utiliza **JWT (JSON Web Token)** para autenticação. Todas as rotas, exceto as de autenticação, requerem um token válido no header `Authorization`.
+
+#### Como usar:
+1. Registre um novo usuário ou faça login
+2. Use o token retornado no header: `Authorization: Bearer {seu-token}`
+3. O token expira em 7 dias (configurável)
+4. Use o refresh token para renovar o token quando expirar
+
+#### Registrar novo usuário
+```http
+POST /api/auth/register
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "email": "usuario@example.com",
+  "name": "Nome do Usuário",
+  "password": "senha123456"
+}
+```
+
+**Resposta (201):**
+```json
+{
+  "user": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "usuario@example.com",
+    "name": "Nome do Usuário",
+    "provider": "local",
+    "createdAt": "2025-12-10T10:00:00.000Z",
+    "updatedAt": "2025-12-10T10:00:00.000Z"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+#### Login
+```http
+POST /api/auth/login
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "email": "usuario@example.com",
+  "password": "senha123456"
+}
+```
+
+**Resposta (200):**
+```json
+{
+  "user": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "usuario@example.com",
+    "name": "Nome do Usuário",
+    "provider": "local",
+    "createdAt": "2025-12-10T10:00:00.000Z",
+    "updatedAt": "2025-12-10T10:00:00.000Z"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+#### Renovar token
+```http
+POST /api/auth/refresh-token
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Resposta (200):**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+#### Obter usuário autenticado
+```http
+GET /api/auth/me
+Authorization: Bearer {token}
+```
+
+**Resposta (200):**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "usuario@example.com",
+  "name": "Nome do Usuário",
+  "provider": "local",
+  "createdAt": "2025-12-10T10:00:00.000Z",
+  "updatedAt": "2025-12-10T10:00:00.000Z",
+  "bookings": []
+}
+```
+
+---
+
+### 👤 Usuários
+
+**⚠️ Todas as rotas de usuários requerem autenticação**
+
+#### Listar todos os usuários
+```http
+GET /api/users
+```
+
+**Resposta (200):**
+```json
+[
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "joao@example.com",
+    "name": "João Silva",
+    "createdAt": "2025-12-10T10:00:00.000Z",
+    "updatedAt": "2025-12-10T10:00:00.000Z",
+    "bookings": []
+  }
+]
+```
+
+#### Buscar usuário por ID
+```http
+GET /api/users/:id
+```
+
+**Resposta (200):**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "joao@example.com",
+  "name": "João Silva",
+  "createdAt": "2025-12-10T10:00:00.000Z",
+  "updatedAt": "2025-12-10T10:00:00.000Z",
+  "bookings": [
+    {
+      "id": "660e8400-e29b-41d4-a716-446655440001",
+      "eventId": "770e8400-e29b-41d4-a716-446655440002",
+      "status": "confirmed",
+      "event": {
+        "title": "Workshop de Node.js",
+        "date": "2025-12-20T14:00:00.000Z"
+      }
+    }
+  ]
+}
+```
+
+#### Criar novo usuário
+```http
+POST /api/users
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "email": "joao@example.com",
+  "name": "João Silva"
+}
+```
+
+**Resposta (201):**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "joao@example.com",
+  "name": "João Silva",
+  "createdAt": "2025-12-10T10:00:00.000Z",
+  "updatedAt": "2025-12-10T10:00:00.000Z"
+}
+```
+
+#### Atualizar usuário
+```http
+PUT /api/users/:id
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "email": "joao.novo@example.com",
+  "name": "João Silva Santos"
+}
+```
+
+**Resposta (200):**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "joao.novo@example.com",
+  "name": "João Silva Santos",
+  "createdAt": "2025-12-10T10:00:00.000Z",
+  "updatedAt": "2025-12-10T11:30:00.000Z"
+}
+```
+
+#### Deletar usuário
+```http
+DELETE /api/users/:id
+```
+
+**Resposta (204):** Sem conteúdo
+
+---
+
+### 🎉 Eventos
+
+**⚠️ Todas as rotas de eventos requerem autenticação**
+
+#### Listar todos os eventos
+```http
+GET /api/events
+```
+
+**Resposta (200):**
+```json
+[
+  {
+    "id": "770e8400-e29b-41d4-a716-446655440002",
+    "title": "Workshop de Node.js",
+    "description": "Aprenda Node.js do zero",
+    "date": "2025-12-20T14:00:00.000Z",
+    "location": "São Paulo - SP",
+    "capacity": 50,
+    "createdAt": "2025-12-10T10:00:00.000Z",
+    "updatedAt": "2025-12-10T10:00:00.000Z",
+    "bookings": []
+  }
+]
+```
+
+#### Buscar evento por ID
+```http
+GET /api/events/:id
+```
+
+**Resposta (200):**
+```json
+{
+  "id": "770e8400-e29b-41d4-a716-446655440002",
+  "title": "Workshop de Node.js",
+  "description": "Aprenda Node.js do zero",
+  "date": "2025-12-20T14:00:00.000Z",
+  "location": "São Paulo - SP",
+  "capacity": 50,
+  "createdAt": "2025-12-10T10:00:00.000Z",
+  "updatedAt": "2025-12-10T10:00:00.000Z",
+  "bookings": [
+    {
+      "id": "660e8400-e29b-41d4-a716-446655440001",
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "status": "confirmed",
+      "user": {
+        "name": "João Silva",
+        "email": "joao@example.com"
+      }
+    }
+  ]
+}
+```
+
+#### Criar novo evento
+```http
+POST /api/events
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "title": "Workshop de Node.js",
+  "description": "Aprenda Node.js do zero",
+  "date": "2025-12-20T14:00:00.000Z",
+  "location": "São Paulo - SP",
+  "capacity": 50
+}
+```
+
+**Resposta (201):**
+```json
+{
+  "id": "770e8400-e29b-41d4-a716-446655440002",
+  "title": "Workshop de Node.js",
+  "description": "Aprenda Node.js do zero",
+  "date": "2025-12-20T14:00:00.000Z",
+  "location": "São Paulo - SP",
+  "capacity": 50,
+  "createdAt": "2025-12-10T10:00:00.000Z",
+  "updatedAt": "2025-12-10T10:00:00.000Z"
+}
+```
+
+#### Atualizar evento
+```http
+PUT /api/events/:id
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "title": "Workshop Avançado de Node.js",
+  "description": "Node.js avançado com TypeScript",
+  "date": "2025-12-21T14:00:00.000Z",
+  "location": "São Paulo - SP",
+  "capacity": 60
+}
+```
+
+**Resposta (200):**
+```json
+{
+  "id": "770e8400-e29b-41d4-a716-446655440002",
+  "title": "Workshop Avançado de Node.js",
+  "description": "Node.js avançado com TypeScript",
+  "date": "2025-12-21T14:00:00.000Z",
+  "location": "São Paulo - SP",
+  "capacity": 60,
+  "createdAt": "2025-12-10T10:00:00.000Z",
+  "updatedAt": "2025-12-10T12:00:00.000Z"
+}
+```
+
+#### Deletar evento
+```http
+DELETE /api/events/:id
+```
+
+**Resposta (204):** Sem conteúdo
+
+---
+
+### 📅 Reservas
+
+**⚠️ Todas as rotas de reservas requerem autenticação**
+
+#### Listar todas as reservas
+```http
+GET /api/bookings
+```
+
+**Resposta (200):**
+```json
+[
+  {
+    "id": "660e8400-e29b-41d4-a716-446655440001",
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "eventId": "770e8400-e29b-41d4-a716-446655440002",
+    "status": "confirmed",
+    "createdAt": "2025-12-10T10:30:00.000Z",
+    "updatedAt": "2025-12-10T10:30:00.000Z",
+    "user": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "João Silva",
+      "email": "joao@example.com"
+    },
+    "event": {
+      "id": "770e8400-e29b-41d4-a716-446655440002",
+      "title": "Workshop de Node.js",
+      "date": "2025-12-20T14:00:00.000Z",
+      "location": "São Paulo - SP"
+    }
+  }
+]
+```
+
+#### Criar nova reserva
+```http
+POST /api/bookings
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "eventId": "770e8400-e29b-41d4-a716-446655440002"
+}
+```
+
+**Resposta (201):**
+```json
+{
+  "id": "660e8400-e29b-41d4-a716-446655440001",
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "eventId": "770e8400-e29b-41d4-a716-446655440002",
+  "status": "confirmed",
+  "createdAt": "2025-12-10T10:30:00.000Z",
+  "updatedAt": "2025-12-10T10:30:00.000Z",
+  "user": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "João Silva",
+    "email": "joao@example.com"
+  },
+  "event": {
+    "id": "770e8400-e29b-41d4-a716-446655440002",
+    "title": "Workshop de Node.js",
+    "date": "2025-12-20T14:00:00.000Z"
+  }
+}
+```
+
+**Erro - Evento lotado (400):**
+```json
+{
+  "error": "Event is at full capacity"
+}
+```
+
+**Erro - Evento não encontrado (404):**
+```json
+{
+  "error": "Event not found"
+}
+```
+
+#### Deletar reserva
+```http
+DELETE /api/bookings/:id
+```
+
+**Resposta (204):** Sem conteúdo
+
+---
+
+### 📥 Importar no Postman
+
+Você pode importar a collection completa no Postman através do arquivo `postman_collection.json` na raiz do projeto.
 
 ## 📁 Estrutura do Projeto
 

@@ -1,10 +1,17 @@
 import { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
 import prisma from '../config/database';
 
 export class UserController {
   async index(req: Request, res: Response) {
     const users = await prisma.user.findMany({
-      include: {
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        provider: true,
+        createdAt: true,
+        updatedAt: true,
         bookings: {
           include: {
             event: true
@@ -21,7 +28,13 @@ export class UserController {
 
     const user = await prisma.user.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        provider: true,
+        createdAt: true,
+        updatedAt: true,
         bookings: {
           include: {
             event: true
@@ -38,12 +51,34 @@ export class UserController {
   }
 
   async create(req: Request, res: Response) {
-    const { email, name } = req.body;
+    const { email, name, password } = req.body;
+
+    // Verificar se usuário já existe
+    const userExists = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (userExists) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    // Hash da senha se fornecida
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
 
     const user = await prisma.user.create({
       data: {
         email,
-        name
+        name,
+        password: hashedPassword,
+        provider: 'local',
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        provider: true,
+        createdAt: true,
+        updatedAt: true,
       }
     });
 
@@ -52,13 +87,29 @@ export class UserController {
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    const { email, name } = req.body;
+    const { email, name, password } = req.body;
+
+    // Preparar dados para atualização
+    const updateData: any = {
+      email,
+      name,
+    };
+
+    // Se senha foi fornecida, fazer hash
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
 
     const user = await prisma.user.update({
       where: { id },
-      data: {
-        email,
-        name
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        provider: true,
+        createdAt: true,
+        updatedAt: true,
       }
     });
 

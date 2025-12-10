@@ -14,11 +14,12 @@ RUN npm install
 # Copiar prisma schema
 COPY prisma ./prisma/
 
-# Gerar Prisma Client
-RUN npx prisma generate
+# Copiar script de entrypoint
+COPY docker-entrypoint.dev.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.dev.sh
 
 # Expor porta
 EXPOSE 3000
 
 # Comando para desenvolvimento
-CMD ["npm", "run", "dev"]
+CMD ["docker-entrypoint.dev.sh"]

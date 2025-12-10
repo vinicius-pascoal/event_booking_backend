@@ -12,13 +12,17 @@ datasource db {
 
 // Exemplo de modelo para sistema de reserva de eventos
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  bookings  Booking[]
+  id         String    @id @default(uuid())
+  email      String    @unique
+  name       String
+  password   String? // Opcional para suportar OAuth
+  provider   String    @default("local") // "local", "google", "facebook", etc.
+  providerId String? // ID do provedor OAuth (Google ID, Facebook ID, etc.)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  bookings   Booking[]
 
+  @@unique([provider, providerId])
   @@map("users")
 }
 
