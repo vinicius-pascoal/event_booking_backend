@@ -12,6 +12,19 @@ export class VenueController {
     return res.json(venues);
   }
 
+  async getHighlights(req: Request, res: Response) {
+    const venues = await prisma.venue.findMany({
+      where: {
+        isHighlight: true
+      },
+      include: {
+        bookings: true
+      }
+    });
+
+    return res.json(venues);
+  }
+
   async show(req: Request, res: Response) {
     const { id } = req.params;
 

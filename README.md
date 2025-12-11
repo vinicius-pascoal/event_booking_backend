@@ -413,6 +413,30 @@ Authorization: Bearer {token}
     "description": "Auditório com capacidade para 100 pessoas",
     "location": "São Paulo - SP, Rua Exemplo 123",
     "capacity": 100,
+    "isHighlight": true,
+    "createdAt": "2025-12-10T10:00:00.000Z",
+    "updatedAt": "2025-12-10T10:00:00.000Z",
+    "bookings": []
+  }
+]
+```
+
+#### Listar locais em destaque
+```http
+GET /api/venues/highlights
+Authorization: Bearer {token}
+```
+
+**Resposta (200):**
+```json
+[
+  {
+    "id": "770e8400-e29b-41d4-a716-446655440002",
+    "name": "Auditório Principal",
+    "description": "Auditório com capacidade para 100 pessoas",
+    "location": "São Paulo - SP, Rua Exemplo 123",
+    "capacity": 100,
+    "isHighlight": true,
     "createdAt": "2025-12-10T10:00:00.000Z",
     "updatedAt": "2025-12-10T10:00:00.000Z",
     "bookings": []
@@ -434,6 +458,7 @@ Authorization: Bearer {token}
   "description": "Auditório com capacidade para 100 pessoas",
   "location": "São Paulo - SP, Rua Exemplo 123",
   "capacity": 100,
+  "isHighlight": true,
   "createdAt": "2025-12-10T10:00:00.000Z",
   "updatedAt": "2025-12-10T10:00:00.000Z",
   "bookings": [
@@ -465,7 +490,8 @@ Content-Type: application/json
   "name": "Auditório Principal",
   "description": "Auditório com capacidade para 100 pessoas",
   "location": "São Paulo - SP, Rua Exemplo 123",
-  "capacity": 100
+  "capacity": 100,
+  "isHighlight": true
 }
 ```
 
@@ -477,6 +503,7 @@ Content-Type: application/json
   "description": "Auditório com capacidade para 100 pessoas",
   "location": "São Paulo - SP, Rua Exemplo 123",
   "capacity": 100,
+  "isHighlight": true,
   "createdAt": "2025-12-10T10:00:00.000Z",
   "updatedAt": "2025-12-10T10:00:00.000Z"
 }
@@ -495,7 +522,8 @@ Content-Type: application/json
   "name": "Auditório Principal Renovado",
   "description": "Auditório reformado com capacidade para 150 pessoas",
   "location": "São Paulo - SP, Rua Exemplo 123",
-  "capacity": 150
+  "capacity": 150,
+  "isHighlight": false
 }
 ```
 
@@ -507,6 +535,7 @@ Content-Type: application/json
   "description": "Auditório reformado com capacidade para 150 pessoas",
   "location": "São Paulo - SP, Rua Exemplo 123",
   "capacity": 150,
+  "isHighlight": false,
   "createdAt": "2025-12-10T10:00:00.000Z",
   "updatedAt": "2025-12-10T12:00:00.000Z"
 }
@@ -763,6 +792,7 @@ event_booking_backend/
 - email (String, único)
 - name (String)
 - password (String, hash bcrypt)
+- isAdmin (Boolean, padrão: false) - Indica se o usuário é administrador
 - provider (String, padrão: "local")
 - providerId (String, opcional - para OAuth)
 - createdAt (DateTime)
@@ -774,6 +804,7 @@ event_booking_backend/
 - description (String, opcional) - Descrição do local
 - location (String) - Endereço físico
 - capacity (Int) - Capacidade máxima
+- isHighlight (Boolean, padrão: false) - Indica se o local está em destaque
 - createdAt (DateTime)
 - updatedAt (DateTime)
 

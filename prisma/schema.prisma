@@ -16,6 +16,7 @@ model User {
   email      String    @unique
   name       String
   password   String? // Opcional para suportar OAuth
+  isAdmin    Boolean   @default(false)
   provider   String    @default("local") // "local", "google", "facebook", etc.
   providerId String? // ID do provedor OAuth (Google ID, Facebook ID, etc.)
   createdAt  DateTime  @default(now())
@@ -33,6 +34,7 @@ model Venue {
   description String?
   location    String
   capacity    Int
+  isHighlight Boolean   @default(false) // Indica se o venue está em destaque
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   bookings    Booking[]
