@@ -433,7 +433,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Auditório Principal\",\n  \"description\": \"Auditório com capacidade para 100 pessoas\",\n  \"location\": \"São Paulo - SP, Rua Exemplo 123\",\n  \"capacity\": 100,\n  \"isHighlight\": true\n}"
+              "raw": "{\n  \"name\": \"Auditório Principal\",\n  \"description\": \"Auditório com capacidade para 100 pessoas\",\n  \"location\": \"São Paulo - SP, Rua Exemplo 123\",\n  \"capacity\": 100,\n  \"isHighlight\": true,\n  \"images\": [\"auditorium-1.jpg\", \"auditorium-2.jpg\", \"auditorium-3.jpg\"],\n  \"mainImage\": \"auditorium-main.jpg\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/venues",
@@ -460,7 +460,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Auditório Principal Renovado\",\n  \"description\": \"Auditório reformado com capacidade para 150 pessoas\",\n  \"location\": \"São Paulo - SP, Rua Exemplo 123\",\n  \"capacity\": 150,\n  \"isHighlight\": false\n}"
+              "raw": "{\n  \"name\": \"Auditório Principal Renovado\",\n  \"description\": \"Auditório reformado com capacidade para 150 pessoas\",\n  \"location\": \"São Paulo - SP, Rua Exemplo 123\",\n  \"capacity\": 150,\n  \"isHighlight\": false,\n  \"images\": [\"auditorium-renovated-1.jpg\", \"auditorium-renovated-2.jpg\"],\n  \"mainImage\": \"auditorium-renovated-main.jpg\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/venues/{{venueId}}",

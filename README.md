@@ -398,6 +398,27 @@ DELETE /api/users/:id
 
 **⚠️ Todas as rotas de locais requerem autenticação**
 
+#### 🖼️ Gerenciamento de Imagens
+
+Os venues utilizam **TwicPics** para otimização e entrega de imagens. As imagens são armazenadas como paths relativos no banco de dados e servidas através do domínio TwicPics.
+
+**Configuração:**
+- **Domínio TwicPics**: `https://viniciuspteste.twic.pics`
+- **Source URL**: `https://my-storage.com/venues/`
+
+**Como usar:**
+1. Faça upload da imagem para `https://my-storage.com/venues/` (ex: `auditorium-1.jpg`)
+2. Armazene apenas o nome do arquivo no banco: `"auditorium-1.jpg"`
+3. No frontend, concatene com o domínio TwicPics: `https://viniciuspteste.twic.pics/auditorium-1.jpg`
+
+**Benefícios do TwicPics:**
+- Redimensionamento automático
+- Otimização de performance
+- Suporte a formatos modernos (WebP, AVIF)
+- Transformações on-the-fly
+
+---
+
 #### Listar todos os locais
 ```http
 GET /api/venues
@@ -414,6 +435,8 @@ Authorization: Bearer {token}
     "location": "São Paulo - SP, Rua Exemplo 123",
     "capacity": 100,
     "isHighlight": true,
+    "images": ["auditorium-1.jpg", "auditorium-2.jpg", "auditorium-3.jpg"],
+    "mainImage": "auditorium-main.jpg",
     "createdAt": "2025-12-10T10:00:00.000Z",
     "updatedAt": "2025-12-10T10:00:00.000Z",
     "bookings": []
@@ -437,6 +460,8 @@ Authorization: Bearer {token}
     "location": "São Paulo - SP, Rua Exemplo 123",
     "capacity": 100,
     "isHighlight": true,
+    "images": ["auditorium-1.jpg", "auditorium-2.jpg", "auditorium-3.jpg"],
+    "mainImage": "auditorium-main.jpg",
     "createdAt": "2025-12-10T10:00:00.000Z",
     "updatedAt": "2025-12-10T10:00:00.000Z",
     "bookings": []
@@ -459,6 +484,8 @@ Authorization: Bearer {token}
   "location": "São Paulo - SP, Rua Exemplo 123",
   "capacity": 100,
   "isHighlight": true,
+  "images": ["auditorium-1.jpg", "auditorium-2.jpg", "auditorium-3.jpg"],
+  "mainImage": "auditorium-main.jpg",
   "createdAt": "2025-12-10T10:00:00.000Z",
   "updatedAt": "2025-12-10T10:00:00.000Z",
   "bookings": [
@@ -491,7 +518,9 @@ Content-Type: application/json
   "description": "Auditório com capacidade para 100 pessoas",
   "location": "São Paulo - SP, Rua Exemplo 123",
   "capacity": 100,
-  "isHighlight": true
+  "isHighlight": true,
+  "images": ["auditorium-1.jpg", "auditorium-2.jpg", "auditorium-3.jpg"],
+  "mainImage": "auditorium-main.jpg"
 }
 ```
 
@@ -504,6 +533,8 @@ Content-Type: application/json
   "location": "São Paulo - SP, Rua Exemplo 123",
   "capacity": 100,
   "isHighlight": true,
+  "images": ["auditorium-1.jpg", "auditorium-2.jpg", "auditorium-3.jpg"],
+  "mainImage": "auditorium-main.jpg",
   "createdAt": "2025-12-10T10:00:00.000Z",
   "updatedAt": "2025-12-10T10:00:00.000Z"
 }
@@ -523,7 +554,9 @@ Content-Type: application/json
   "description": "Auditório reformado com capacidade para 150 pessoas",
   "location": "São Paulo - SP, Rua Exemplo 123",
   "capacity": 150,
-  "isHighlight": false
+  "isHighlight": false,
+  "images": ["auditorium-renovated-1.jpg", "auditorium-renovated-2.jpg"],
+  "mainImage": "auditorium-renovated-main.jpg"
 }
 ```
 
@@ -536,6 +569,8 @@ Content-Type: application/json
   "location": "São Paulo - SP, Rua Exemplo 123",
   "capacity": 150,
   "isHighlight": false,
+  "images": ["auditorium-renovated-1.jpg", "auditorium-renovated-2.jpg"],
+  "mainImage": "auditorium-renovated-main.jpg",
   "createdAt": "2025-12-10T10:00:00.000Z",
   "updatedAt": "2025-12-10T12:00:00.000Z"
 }
@@ -805,6 +840,8 @@ event_booking_backend/
 - location (String) - Endereço físico
 - capacity (Int) - Capacidade máxima
 - isHighlight (Boolean, padrão: false) - Indica se o local está em destaque
+- images (String[]) - Array de URLs/paths das imagens (ex: ["venue1.jpg", "venue2.jpg"])
+- mainImage (String, opcional) - URL/path da imagem principal
 - createdAt (DateTime)
 - updatedAt (DateTime)
 

@@ -47,14 +47,17 @@ export class VenueController {
   }
 
   async create(req: Request, res: Response) {
-    const { name, description, location, capacity } = req.body;
+    const { name, description, location, capacity, isHighlight, images, mainImage } = req.body;
 
     const venue = await prisma.venue.create({
       data: {
         name,
         description,
         location,
-        capacity
+        capacity,
+        isHighlight,
+        images: images || [],
+        mainImage
       }
     });
 
@@ -63,7 +66,7 @@ export class VenueController {
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    const { name, description, location, capacity } = req.body;
+    const { name, description, location, capacity, isHighlight, images, mainImage } = req.body;
 
     const venue = await prisma.venue.update({
       where: { id },
@@ -71,7 +74,10 @@ export class VenueController {
         name,
         description,
         location,
-        capacity
+        capacity,
+        isHighlight,
+        images,
+        mainImage
       }
     });
 

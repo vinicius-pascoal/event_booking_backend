@@ -35,6 +35,8 @@ model Venue {
   location    String
   capacity    Int
   isHighlight Boolean   @default(false) // Indica se o venue está em destaque
+  images      String[] // Array de URLs/paths das imagens (ex: ["venue1.jpg", "venue2.jpg"])
+  mainImage   String? // URL/path da imagem principal
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   bookings    Booking[]
