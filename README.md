@@ -189,7 +189,19 @@ npm run prisma:studio
 
 Base URL: `http://localhost:3000/api`
 
-### 🔐 Autenticação
+### � Documentação Swagger
+
+A API possui documentação interativa completa via Swagger UI:
+
+**URL**: `http://localhost:3000/api-docs`
+
+No Swagger você pode:
+- Visualizar todos os endpoints disponíveis
+- Testar as rotas diretamente no navegador
+- Ver exemplos de requisições e respostas
+- Autenticar com JWT Bearer Token
+
+### �🔐 Autenticação
 
 A API utiliza **JWT (JSON Web Token)** para autenticação. Todas as rotas, exceto as de autenticação, requerem um token válido no header `Authorization`.
 
