@@ -33,7 +33,7 @@ services:
       - postgres
     networks:
       - event_booking_network
-    command: sh -c "npx prisma migrate deploy && npm start"
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && npm start"
 
 volumes:
   postgres_data:

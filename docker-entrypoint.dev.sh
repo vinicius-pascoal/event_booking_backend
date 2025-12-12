@@ -11,5 +11,8 @@ echo "✅ PostgreSQL conectado!"
 echo "🔄 Gerando Prisma Client..."
 npx prisma generate
 
+echo "🌱 Executando seed do banco de dados..."
+npx prisma db seed || echo "⚠️  Seed não executada ou já aplicada"
+
 echo "🚀 Iniciando servidor..."
 npm run dev

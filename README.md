@@ -51,6 +51,11 @@ docker-compose up -d
 
 Pronto! A aplicação estará rodando em `http://localhost:3000` e o PostgreSQL na porta `5432`.
 
+**📝 Nota sobre Seed**: Ao usar Docker, a seed é executada automaticamente na primeira inicialização, criando:
+- Usuário admin: admin@eventbooking.com / Admin@123456
+- Usuário padrão: user@eventbooking.com / User@123456
+- 6 venues de exemplo
+
 ### Opção 2: Sem Docker
 
 1. Clone o repositório
@@ -83,6 +88,18 @@ npm run prisma:migrate
 ```bash
 npm run prisma:generate
 ```
+
+6. Execute a seed para popular o banco (opcional)
+```bash
+npm run prisma:seed
+```
+
+A seed criará:
+- Um usuário administrador (admin@eventbooking.com / Admin@123456)
+- Um usuário padrão (user@eventbooking.com / User@123456)
+- 6 venues de exemplo
+
+⚠️ **IMPORTANTE**: Altere as senhas padrão após o primeiro login!
 
 ## 🎮 Como usar
 
